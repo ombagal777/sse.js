@@ -1,9 +1,4 @@
 export type SSE = {
-  /** Constructor. */
-  new (url: string, options?: SSEOptions): SSE;
-
-  url: string;
-
   /**
    * - headers
    */
@@ -11,7 +6,7 @@ export type SSE = {
   /**
    * - payload
    */
-  payload?: SSEPayload;
+  payload: SSEPayload;
   /**
    * - HTTP Method
    */
@@ -25,13 +20,21 @@ export type SSE = {
    */
   debug: boolean;
   /**
-   * - flag, if connection should auto-reconnect on disconnect/error
+   * - flag, if connection should auto-reconnect
    */
   autoReconnect: boolean;
   /**
    * - delay in ms before reconnecting
    */
   reconnectDelay: number;
+  /**
+   * - strategy for calculating reconnect delays
+   */
+  reconnectDelayStrategy: string;
+  /**
+   * - maximum reconnect delay cap
+   */
+  maxReconnectDelay: number | null;
   /**
    * - maximum number of reconnect attempts
    */
@@ -40,15 +43,12 @@ export type SSE = {
    * - flag, if Last-Event-ID header should be sent
    */
   useLastEventId: boolean;
-  reconnectTimer: number | null;
-  retryCount: number;
   FIELD_SEPARATOR: string;
   listeners: Record<string, Function[]>;
   xhr: XMLHttpRequest | null;
   readyState: number;
   progress: number;
   chunk: string;
-  lastEventId: string;
   INITIALIZING: -1;
   CONNECTING: 0;
   OPEN: 1;
@@ -103,6 +103,14 @@ export type SSEOptions = {
    */
   reconnectDelay?: number;
   /**
+   * - strategy for calculating reconnect delays
+   */
+  reconnectDelayStrategy?: string;
+  /**
+   * - maximum reconnect delay cap
+   */
+  maxReconnectDelay?: number | null;
+  /**
    * - maximum number of reconnect attempts
    */
   maxRetries?: number | null;
@@ -117,7 +125,9 @@ export type _SSEvent = {
   source?: SSE;
   responseCode?: number;
   lastEventId?: string;
-  headers?: Record<string, string[]>;
+  headers?: {
+    [x: string]: string[];
+  };
 };
 export type _ReadyStateEvent = {
   readyState: number;
@@ -161,4 +171,4 @@ export type OnAbort = (event: SSEvent) => void;
  * @return {SSE}
  */
 export var SSE: SSE;
-//# sourceMappingURL=sse.d.ts.map
+//# sourceMappingURL=sse.d.ts.map
