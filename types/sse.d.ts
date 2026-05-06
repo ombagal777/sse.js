@@ -30,7 +30,11 @@ export type SSE = {
   /**
    * - strategy for calculating reconnect delays
    */
-  reconnectDelayStrategy: string;
+  reconnectDelayStrategy: 'fixed' | 'exponential' | 'jitter' | 'custom';
+  /**
+   * - custom reconnect delay callback (used when reconnectDelayStrategy is "custom")
+   */
+  customReconnectDelay: ((context: ReconnectDelayContext) => number) | null;
   /**
    * - maximum reconnect delay cap
    */
@@ -64,6 +68,18 @@ export type SSE = {
   onreadystatechange: OnReadystatechange;
   onerror: OnError;
   onabort: OnAbort;
+};
+export type ReconnectDelayContext = {
+  /** - current retry attempt count */
+  retryCount: number;
+  /** - base reconnect delay in ms */
+  baseDelay: number;
+  /** - delay used in the previous attempt */
+  lastDelay: number | null;
+  /** - server-provided retry delay floor */
+  serverRetryDelay: number | null;
+  /** - maximum reconnect delay cap */
+  maxReconnectDelay: number | null;
 };
 export type SSEHeaders = {
   [key: string]: string;
@@ -105,7 +121,11 @@ export type SSEOptions = {
   /**
    * - strategy for calculating reconnect delays
    */
-  reconnectDelayStrategy?: string;
+  reconnectDelayStrategy?: 'fixed' | 'exponential' | 'jitter' | 'custom';
+  /**
+   * - custom reconnect delay callback (used when reconnectDelayStrategy is "custom")
+   */
+  customReconnectDelay?: (context: ReconnectDelayContext) => number;
   /**
    * - maximum reconnect delay cap
    */
